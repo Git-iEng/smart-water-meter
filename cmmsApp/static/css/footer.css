@@ -1,0 +1,117 @@
+.footer {
+  background-color: #000;
+  color: #fff;
+  padding: 40px 20px 20px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Main layout */
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  row-gap: 16px;          /* smaller default vertical gap */
+}
+
+/* Heading column */
+.footer-heading {
+  flex: 1 1 120px;
+  margin-bottom: 8px;
+}
+
+.footer-heading h2,
+.footer-heading p {
+  margin: 0 0 10px;
+}
+
+/* Contact column */
+.footer-left {
+  flex: 1 1 120px;
+  margin-bottom: 8px;
+}
+
+.footer-left p {
+  margin: 4px 0;
+}
+
+.footer-left a {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Links column */
+.footer-links {
+  flex: 0 0 auto;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+
+.footer-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links ul li {
+  margin: 4px 0;
+}
+
+.footer-links a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Bottom row */
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  border-top: 1px solid #333;
+  padding-top: 12px;
+}
+
+.social-icons a {
+  color: #fff;
+  margin-right: 12px;
+  font-size: 16px;
+}
+
+/* ========== MOBILE ========== */
+@media screen and (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    align-items: flex-start;
+    row-gap: 8px;            /* much tighter vertical spacing */
+  }
+
+  .footer-heading,
+  .footer-left,
+  .footer-links {
+    width: 100%;
+  }
+
+  .footer-links {
+    margin-top: 4px;         /* almost directly under contact block */
+    margin-bottom: 8px;
+  }
+
+  .footer-links ul li {
+    margin: 3px 0;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
