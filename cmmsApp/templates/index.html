@@ -14,6 +14,18 @@
   <link rel="icon" href="{% static 'images/logo1.avif' %}">
   <link rel="stylesheet" href="{% static 'css/footer.css' %}">
   <script defer src="{% static 'js/main.js' %}"></script>
+
+  <script>
+  window.addEventListener("pageshow", function (event) {
+    const navEntries = performance.getEntriesByType("navigation");
+    const navType = navEntries.length ? navEntries[0].type : null;
+
+    if (event.persisted || navType === "back_forward") {
+      window.location.reload();
+    }
+  });
+</script>
+
 </head>
 <body>
   {% include 'header.html' %}
