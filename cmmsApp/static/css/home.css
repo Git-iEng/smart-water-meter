@@ -2387,3 +2387,98 @@ section.section-hero-solar-system.section-hero-solar-system--water {
     margin-bottom: 20px;
   }
 }
+
+
+/* ---------- FIX CONSULT FORM MOBILE LAYOUT ---------- */
+@media (max-width: 600px) {
+
+  /* Force the grid to go 1 column */
+  .consult-block__inner {
+    display: block !important;
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Force the form to full width */
+  .consult-form {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 16px !important;
+    border-radius: 12px;
+    box-sizing: border-box !important;
+  }
+
+  /* Remove extra margins from wrapper */
+  #contact,
+  .consult-block,
+  .cmms-contact-form-wrap {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+}
+/* ---- Mobile: add gap around contact form ---- */
+@media (max-width: 600px) {
+  .consult-form {
+    /* full-width minus side margins */
+    width: calc(100% - 32px) !important;
+    max-width: none !important;
+
+    /* space from screen edge + a little bottom gap */
+    margin: 0 16px 24px !important;
+    padding: 16px !important;
+
+    box-sizing: border-box !important;
+    border-radius: 16px;
+  }
+}
+/* ====== MOBILE: keep inputs inside the teal card ====== */
+@media (max-width: 600px) {
+
+  /* Make each field respect the card padding */
+  .consult-form input,
+  .consult-form select,
+  .consult-form textarea {
+    width: 100% !important;          /* fill the available space */
+    max-width: 100% !important;      /* never grow beyond card */
+    box-sizing: border-box !important;
+    display: block;
+    margin: 0;                       /* remove any side margins */
+  }
+
+  /* If someone types a very long string with no spaces,
+     don’t let it stretch the input wider than the card */
+  .consult-form input[type="text"],
+  .consult-form input[type="email"],
+  .consult-form input[type="tel"] {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+/* ===== MOBILE PADDING FOR MISSION / VISION / VALUES ===== */
+@media (max-width: 600px) {
+  .-gemini-mission-section {
+    /* full width with nice side padding like the contact form */
+    width: 100%;
+    max-width: 100%;
+    padding: 0 16px 24px !important;   /* left/right padding + a bit bottom */
+    box-sizing: border-box;
+  }
+}
+/* ===== MOBILE PADDING FOR ABOUT-US SECTION ===== */
+@media (max-width: 600px) {
+  /* "About us – where vision meets execution" block */
+  #about-us.cmms-contact-form-wrap .cmms-contact-form-inner {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 16px 24px !important;   /* left/right padding + bottom space */
+    box-sizing: border-box;
+    margin: 0;
+  }
+}
+
