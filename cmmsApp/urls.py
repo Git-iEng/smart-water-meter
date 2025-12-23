@@ -34,7 +34,7 @@ urlpatterns = [
 
 
 
- path('sitemap.xml', views.sitemap, name='sitemap'),
+ path("sitemap.xml", views.sitemap, name="sitemap"),
       path("sitemap.xml", serve, {"path": "sitemap.xml", "document_root": settings.STATICFILES_DIRS}),
 
     path('contact/', views.contact, name='contact'),

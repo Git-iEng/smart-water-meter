@@ -38,7 +38,9 @@ from django.http import FileResponse, JsonResponse, Http404
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.urls import reverse
-
+from django.http import HttpResponse
+from django.contrib.staticfiles.storage import staticfiles_storage
+ 
 
 # ---------- Validation patterns ----------
 NAME_RE  = re.compile(r"^[A-Za-z\s'.-]{2,}$")
@@ -117,6 +119,9 @@ def _send_contact_email_async(subject: str, text_body: str, html_body: str | Non
     Thread(target=_send_email, args=(subject, text_body, html_body, recipients), daemon=True).start()
 
 
+def sitemap(request):
+    with staticfiles_storage.open("sitemap.xml") as f:
+        return HttpResponse(f.read(), content_type="application/xml")
 # ---------- Views ----------
 def request_demo_view(request):
     if request.method != "POST":
