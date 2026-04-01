@@ -15,6 +15,16 @@ import os, re
 import pandas as pd
 import phonenumbers
 import pycountry
+import requests 
+# --- imports you need at the top of views.py ---
+from pathlib import Path
+import os, mimetypes, re
+from django.http import FileResponse, JsonResponse, Http404
+from django.core import signing
+from django.utils import timezone
+from django.views.decorators.http import require_POST
+from django.urls import reverse
+from django.conf import settings
 from phonenumbers import PhoneNumberFormat
 from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
@@ -126,7 +136,14 @@ def sitemap(request):
 def request_demo_view(request):
     if request.method != "POST":
         return redirect("/")
+    
+    # CAPTCHA check 
 
+    if not verify_recaptcha(request): 
+
+        messages.error(request, "Please complete the CAPTCHA.") 
+
+        return redirect(request.META.get("HTTP_REFERER", "/")) 
     # Pull fields
     full_name = request.POST.get("full_name", "").strip()
     company   = request.POST.get("company", "").strip()
@@ -170,9 +187,9 @@ def request_demo_view(request):
 
     # Build email
     ts = timezone.now().strftime("%Y-%m-%d %H:%M:%S %Z")
-    subject = "New CARL Demo Request"
+    subject = "Smart Water Management enquiry"
     text_body = (
-        "A new CARL demo request was submitted.\n\n"
+        "A Smart Water Management request was submitted.\n\n"
         f"Submitted: {ts}\n"
         f"IP: {request.META.get('REMOTE_ADDR','')}\n\n"
         f"Full name: {full_name}\n"
@@ -183,9 +200,12 @@ def request_demo_view(request):
         f"Address: {address}\n\n"
         "Message:\n"
         f"{message or '(none)'}\n"
+
+        f"From: {request.META.get('HTTP_REFERER','')}",
+        f"IP:   {request.META.get('REMOTE_ADDR','')}",
     )
     html_body = f"""
-        <h2 style="margin:0 0 8px">New CARL Demo Request</h2>
+        <h2 style="margin:0 0 8px">A Smart Water Management request was submitted.</h2>
         <p style="margin:0 0 12px;color:#334">Submitted {ts} from {request.META.get('REMOTE_ADDR','')}</p>
         <table cellpadding="6" cellspacing="0" style="border-collapse:collapse;background:#f9fbfc">
           <tr><td><b>Full name</b></td><td>{full_name}</td></tr>
@@ -206,19 +226,23 @@ def request_demo_view(request):
 
 
 def home(request):
-    return render(request, "index.html")
+    return render(request, "index.html", { 
+"RECAPTCHA_SITE_KEY": settings.RECAPTCHA_SITE_KEY 
+}) 
 
 
 def request_demo(request):
-    return render(request, "request_demo_modal.html")
+    return render(request, "request_demo_modal.html", { 
+"RECAPTCHA_SITE_KEY": settings.RECAPTCHA_SITE_KEY 
+}) 
 
-def contact(request):     return render(request, "contact.html")
+def contact(request):     
+    return render(request, "contact.html")
 
-def about(request):       return render(request, "about.html")
+def about(request):       
+    return render(request, "about.html")
 
 
-
-def contact(request):     return render(request, "neplan-contact.html")
 def contact_section(request):
     form = ContactForm(request.POST or None)
 
@@ -265,6 +289,8 @@ def contact_section(request):
                 "",
                 "Message:",
                 cd.get("message", ""),
+                f"From: {request.META.get('HTTP_REFERER','')}",
+                f"IP:   {request.META.get('REMOTE_ADDR','')}",
             ]
         )
 
@@ -326,6 +352,14 @@ def contact_block_submit(request):
     """
     if request.method != "POST":
         return redirect(request.META.get("HTTP_REFERER", "/"))
+    
+    # CAPTCHA check 
+
+    if not verify_recaptcha(request): 
+
+        messages.error(request, "Please complete the CAPTCHA.") 
+
+        return redirect(request.META.get("HTTP_REFERER", "/")) 
 
     name    = (request.POST.get("name")    or "").strip()
     email   = (request.POST.get("email")   or "").strip()
@@ -397,7 +431,7 @@ def contact_block_submit(request):
     # Reuse your async sender
     _send_contact_email_async(subject, text_body, None)
 
-    messages.success(request, "Thanks! Your request was submitted successfully.")
+   # messages.success(request, "Thanks! Your request was submitted successfully.")
     return redirect(reverse("cmmsApp:contact_thanks"))
 
 def neplan_electricity(request):
@@ -435,15 +469,6 @@ def contact_thanks(request):
 def sitemap(request):
     with staticfiles_storage.open('sitemap.xml') as sitemap_file:
         return HttpResponse(sitemap_file, content_type='application/xml')
-# --- imports you need at the top of views.py ---
-from pathlib import Path
-import os, mimetypes, re
-from django.http import FileResponse, JsonResponse, Http404
-from django.core import signing
-from django.utils import timezone
-from django.views.decorators.http import require_POST
-from django.urls import reverse
-# (and your other imports… NAME_RE, validate_email, etc.)
 
 # ---------- Downloads config ----------
 DOWNLOAD_DIR = Path(__file__).resolve().parent / "downloads"
@@ -529,3 +554,48 @@ def download_file(request):
     resp = FileResponse(open(path, "rb"), content_type=ctype or "application/octet-stream")
     resp["Content-Disposition"] = f'attachment; filename="{name}"'
     return resp
+def verify_recaptcha(request): 
+
+    captcha_response = (request.POST.get("g-recaptcha-response") or "").strip() 
+
+    print("captcha_response:", captcha_response) 
+
+    print("captcha length:", len(captcha_response) if captcha_response else 0) 
+
+    if not captcha_response: 
+
+        print("reCAPTCHA failed: no captcha response") 
+
+        return False 
+
+    data = { 
+
+        "secret": settings.RECAPTCHA_SECRET_KEY, 
+
+        "response": captcha_response, 
+
+    } 
+
+    try: 
+
+        response = requests.post( 
+
+            "https://www.google.com/recaptcha/api/siteverify", 
+
+            data=data, 
+
+            timeout=10 
+
+        ) 
+
+        result = response.json() 
+
+        print("reCAPTCHA result:", result) 
+
+        return result.get("success", False) 
+
+    except requests.RequestException as e: 
+
+        print("reCAPTCHA request error:", str(e)) 
+
+        return False 
